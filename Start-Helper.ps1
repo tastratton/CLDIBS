@@ -1,0 +1,1 @@
+Start-Process -Wait -NoNewWindow -WorkingDirectory .\helper -FilePath .\helper\bin\Debug\net8.0\helper.exe -ArgumentList $args
