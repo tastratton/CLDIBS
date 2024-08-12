@@ -14,7 +14,7 @@ public class TimeCommand : Command
     }
     public static void AddOptions(Command command)
     {
-        var timezoneOption = new Option<double?>(
+        var timezoneOption = new Option<double>(
             aliases: new[] { "--timezone", "-z" },
             description: "The positive or negative GMT offset");
 

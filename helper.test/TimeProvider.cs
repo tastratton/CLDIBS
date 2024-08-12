@@ -6,6 +6,12 @@ using Microsoft.Extensions.Time.Testing;
 using System.Globalization;
 using System.Text.Json;
 using Xunit.Abstractions;
+using System;
+using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.CommandLine.Parsing;
+using System.CommandLine;
+//using System.CommandLine.NamingConventionBinder;
 
 namespace helper.test;
 
@@ -15,7 +21,15 @@ public class TimeProviderFixture : IDisposable
     public Mock<ILogger<TimeCommandHandler>> MockLogger { get; }
     public ILogger<TimeCommandHandler> Logger { get; }
     public System.CommandLine.Invocation.InvocationContext? Invoker { get; }
-    public TimeCommandHandler TimeCommandHandler {get;}
+    public TimeCommandHandler TimeCommandHandler { get; }
+
+    public System.CommandLine.Parsing.ParseResult ParseResult { get; }
+
+    private readonly TimeCommand _timeCommand;
+    private readonly Parser _parser;
+    private readonly ParseResult _parseResult;
+
+
 
     public TimeProviderFixture()
     {
@@ -23,17 +37,37 @@ public class TimeProviderFixture : IDisposable
         FakeTimeProvider = new FakeTimeProvider();
         MockLogger = new Mock<ILogger<TimeCommandHandler>>();
         Logger = MockLogger.Object;
-        Invoker = new System.CommandLine.Invocation.InvocationContext(null); // todo fix warning by creating / passing the requred mocks
+        //_timeCommand = new TimeCommand();
+        //_timeCommand.Handler = CommandHandler.Create(() => true);
+        //_parser = new Parser(_timeCommand);
+        //var wasCalled = false;
+        //var command = new Command("command");
+        //command.Handler = CommandHandler.Create(() => wasCalled = true);
+        //var parser = new Parser(command);
+
+        //await parser.InvokeAsync("command", _console);
+
+        //_parseResult = new ParseResult();
+
+        //var parser = new Parser(TimeCommand);
+        //var parseResult = parser.Parse(stringCommand);
+        //var invocationContext = new InvocationContext(parseResult, _console);
+        var command = new TimeCommand();
+        var config = new System.CommandLine.CommandLineConfiguration(command);
+        command.Handler = new TimeCommandHandler(FakeTimeProvider);
+        ParseResult parseResult = command.Parse("time -z -5");
         TimeCommandHandler = new TimeCommandHandler(FakeTimeProvider, Logger);
         FakeTimeProvider.SetUtcNow(new DateTime(2023, 11, 5));
         FakeTimeProvider.SetLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Greenwich Standard Time"));
+        Invoker = new System.CommandLine.Invocation.InvocationContext(parseResult); 
+
 
     }
 
     public void Dispose()
-    {
-        
-    }
+{
+
+}
 }
 public class TimeProvider : IClassFixture<TimeProviderFixture>
 {
@@ -115,4 +149,36 @@ public class TimeProvider : IClassFixture<TimeProviderFixture>
         _testOutputHelper.WriteLine("Local TimeZone is Greenwich Standard Time");
 
     }
+
+    [Fact]
+    public void ConsoleOutput()
+    {
+        StringWriter testconsole = new StringWriter();
+        Console.SetOut(testconsole);
+
+        fixture.TimeCommandHandler.Invoke(fixture.Invoker);
+        Assert.Equal("5:00:00 AM\r\n", testconsole.ToString());
+
+    }
+    [Fact]
+    public void ParseResult()
+    {
+        StringWriter testconsole = new StringWriter();
+        Console.SetOut(testconsole);
+        Console.SetError(testconsole);
+
+        var command = new TimeCommand();
+        var config = new System.CommandLine.CommandLineConfiguration(command);
+        command.Handler = new TimeCommandHandler(fixture.FakeTimeProvider);
+        ParseResult parseResult = command.Parse("time -z -4");
+        Assert.NotNull(parseResult);
+/*
+        int result = command.Parse("time -z -4").Invoke();
+        _testOutputHelper.WriteLine(boundParseResult.ToString());
+        //var boundParseResult.GetValueForArgument(new Argument<Int>());
+        //boundParseResult.ValueForOption(option).Should().Be(123);
+        Assert.Equal(1, 1);
+*/
+    }
+
 }

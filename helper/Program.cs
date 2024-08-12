@@ -9,6 +9,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
+using System.CommandLine.NamingConventionBinder;
 //using Microsoft.Extensions.Logging;
 //using static System.CommandLine.Help.HelpBuilder;
 //using System.Collections.Generic;
@@ -160,6 +161,7 @@ internal class Program
         //services.AddDataProtection().PersistKeysToFileSystem(dataProtectionKeysFolder); ;
 
         //services.AddOptions<TimeCommandOptions>("SiteTitle")
+        /*
         services
             .AddOptions<TimeOptions>() 
             // todo 1 - do options pattern for DI somewhere else later, remove this
@@ -167,7 +169,7 @@ internal class Program
             //.Bind(Configuration.GetSection(SettingsOptions.ConfigurationSectionName))
             //.ValidateDataAnnotations()
             ;
-
+        */
         services.TryAddSingleton<TimeProvider>(TimeProvider.System);
     }
 

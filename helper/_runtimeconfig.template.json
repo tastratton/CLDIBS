@@ -1,0 +1,12 @@
+﻿{
+/* moved to project file
+    <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.GC.Server" Value="true"/>
+    <RuntimeHostConfigurationOption Include="System.GC.Concurrent" Value="true"/>
+  </ItemGroup>
+  */
+  "configProperties": {
+    "System.GC.Server": true,
+    "System.GC.Concurrent": true
+  }
+}
